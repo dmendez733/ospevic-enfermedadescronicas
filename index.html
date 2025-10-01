@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFORME PARA MEDICACIÓN DE USO CRÓNICO - OSPEVIC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .form-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.25rem;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group select,
+        .input-group input[type="date"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+        th, td {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .error-message {
+            color: #ef4444;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .required-field {
+            border: 2px solid #ef4444; /* Resalta el campo en rojo */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <div class="form-container" id="form-container">
+        <h1 class="text-2xl font-bold text-center mb-4">INFORME PARA MEDICACIÓN DE USO CRÓNICO - OSPEVIC</h1>
+        <p class="text-center text-gray-500 mb-6 text-sm">
+            Esta ficha está destinada solo para pacientes bajo tratamiento crónico. No se deberá transcribir medicamentos de uso ocasional, ni aquellos que requiera estricta vigilancia.
+        </p>
+
+        <!-- Datos Filiatorios -->
+        <div class="form-section">
+            <h2 class="section-title">DATOS FILIATORIOS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="input-group">
+                    <label for="apellido_nombre">Apellido y Nombre: <span class="text-red-500">*</span></label>
+                    <input type="text" id="apellido_nombre" name="apellido_nombre" required>
+                </div>
+                <div class="input-group">
+                    <label for="n_afiliado">N° Afiliado: <span class="text-red-500">*</span></label>
+                    <input type="text" id="n_afiliado" name="n_afiliado" required>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="input-group">
+                    <label for="dni">DNI: <span class="text-red-500">*</span></label>
+                    <input type="text" id="dni" name="dni" required>
+                </div>
+                <div class="input-group">
+                    <label for="sexo">Sexo: <span class="text-red-500">*</span></label>
+                    <select id="sexo" name="sexo" class="w-full" required>
+                        <option value="">Seleccione</option>
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="fecha_nacimiento">Fecha de Nacimiento: <span class="text-red-500">*</span></label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                </div>
+                <div class="input-group">
+                    <label for="telefono">Tel:</label>
+                    <input type="text" id="telefono" name="telefono">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="input-group">
+                    <label for="domicilio">Domicilio: <span class="text-red-500">*</span></label>
+                    <input type="text" id="domicilio" name="domicilio" required>
+                </div>
+                <div class="input-group">
+                    <label for="localidad">Localidad: <span class="text-red-500">*</span></label>
+                    <input type="text" id="localidad" name="localidad" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen de Historia Clínica -->
+        <div class="form-section">
+            <h2 class="section-title">RESUMEN DE HISTORIA CLÍNICA</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Tabla de Enfermedades -->
+                <div class="table-container">
+                    <h3 class="text-lg font-medium mb-2">Enfermedades (Completar al menos una fila)</h3>
+                    <table id="enfermedades-table">
+                        <thead>
+                            <tr>
+                                <th>ENFERMEDADES</th>
+                                <th>DIAGNÓSTICO PRINCIPAL <span class="text-red-500">*</span></th>
+                                <th>FECHA COMIENZO <span class="text-red-500">*</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="enfermedades-table-body">
+                            <tr><td>Cardiovasculares</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Endocrinológicas</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Metabólicas</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Neurológicas</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Pulmonares</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Psiquiátricas</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Renales</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Diabetes</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                            <tr><td>Otras</td><td><input type="text" class="w-full" name="diagnostico"></td><td><input type="date" class="w-full" name="fecha_comienzo"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Fundamentos del Diagnóstico -->
+                <div>
+                    <h3 class="text-lg font-medium mb-2">Fundamentos del Diagnóstico <span class="text-red-500">*</span></h3>
+                    <div class="space-y-2" id="fundamentos-checklist">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="clinica_paciente" name="fundamentos" value="Por clínica del paciente" class="mr-2">
+                            <label for="clinica_paciente">Por clínica del paciente</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="laboratorios_habituales" name="fundamentos" value="Laboratorios habituales" class="mr-2">
+                            <label for="laboratorios_habituales">Laboratorios habituales</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="laboratorios_complejos" name="fundamentos" value="Laboratorio complejos" class="mr-2">
+                            <label for="laboratorios_complejos">Laboratorio complejos</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="r_m_n" name="fundamentos" value="R.M.N" class="mr-2">
+                            <label for="r_m_n">R.M.N</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="tomografia" name="fundamentos" value="Tomografía" class="mr-2">
+                            <label for="tomografia">Tomografía</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="anatomia_patologica" name="fundamentos" value="Anatomía patológica" class="mr-2">
+                            <label for="anatomia_patologica">Anatomía patológica</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="otras_fundamentos" name="fundamentos" value="Otras" class="mr-2">
+                            <label for="otras_fundamentos">Otras</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medicación Indicada -->
+        <div class="form-section">
+            <h2 class="section-title">MEDICACIÓN INDICADA</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PRINCIPIO ACTIVO Y PRESENTACIÓN</th>
+                            <th>UNIDAD POSOLÓGICA</th>
+                            <th>COMP/DÍA</th>
+                            <th>CANT. ENV. MENSUALES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medicacion-table-body">
+                        <tr>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                            <td><input type="text" class="w-full"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button id="add_medication" class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium">
+                    + Añadir otro medicamento
+                </button>
+            </div>
+        </div>
+        
+        <!-- Datos del Médico y Firmas -->
+        <div class="form-section">
+            <h2 class="section-title">DATOS DEL MÉDICO Y FIRMAS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="input-group">
+                    <label for="medico_nombre">Apellido y Nombre del Médico tratante: <span class="text-red-500">*</span></label>
+                    <input type="text" id="medico_nombre" name="medico_nombre" required>
+                </div>
+                <div class="input-group">
+                    <label for="centro_asistencial">Centro Asistencial: <span class="text-red-500">*</span></label>
+                    <input type="text" id="centro_asistencial" name="centro_asistencial" required>
+                </div>
+                <div class="input-group">
+                    <label for="medico_telefono">Tel:</label>
+                    <input type="text" id="medico_telefono" name="medico_telefono">
+                </div>
+                <div class="input-group">
+                    <label for="fecha_firma">Fecha: <span class="text-red-500">*</span></label>
+                    <input type="date" id="fecha_firma" name="fecha_firma" required>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div class="text-center">
+                    <p class="font-bold">Firma y aclaración del Paciente</p>
+                    <hr class="mt-8 border-gray-400">
+                </div>
+                <div class="text-center">
+                    <p class="font-bold">Firma y sello médico</p>
+                    <hr class="mt-8 border-gray-400">
+                </div>
+            </div>
+        </div>
+        
+        <p id="validation-message" class="error-message hidden">
+            Faltan campos obligatorios por completar (*).
+        </p>
+
+        <div class="flex justify-center gap-4 mt-6">
+            <button id="downloadBtn" class="btn btn-primary">Descargar PDF</button>
+        </div>
+    </div>
+
+    <script>
+        const maxMedicamentos = 7;
+        const medicacionTableBody = document.getElementById('medicacion-table-body');
+        const addMedicationBtn = document.getElementById('add_medication');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const validationMessage = document.getElementById('validation-message');
+        const enfermedadesTableBody = document.getElementById('enfermedades-table-body');
+
+        // Establecer fecha actual por defecto
+        document.getElementById('fecha_firma').valueAsDate = new Date();
+
+        // Lógica para añadir medicamento (máximo 7)
+        addMedicationBtn.addEventListener('click', () => {
+            if (medicacionTableBody.children.length < maxMedicamentos) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><input type="text" class="w-full"></td>
+                    <td><input type="text" class="w-full"></td>
+                    <td><input type="text" class="w-full"></td>
+                    <td><input type="text" class="w-full"></td>
+                `;
+                medicacionTableBody.appendChild(newRow);
+            }
+        });
+        
+        // --- Lógica de Validación ---
+        function validateForm() {
+            let isValid = true;
+            validationMessage.classList.add('hidden');
+
+            // 1. Validar campos de texto, select y date obligatorios
+            // Se excluye 'telefono' y 'medico_telefono' de la validación requerida si no tienen el atributo 'required'
+            const requiredInputs = document.querySelectorAll('input[required], select[required]');
+            requiredInputs.forEach(input => {
+                input.classList.remove('required-field');
+                if (!input.value.trim()) {
+                    input.classList.add('required-field');
+                    isValid = false;
+                }
+            });
+
+            // 2. Validar que al menos una fila de la tabla de Enfermedades tenga Datos (Diagnóstico y Fecha)
+            let isEnfermedadCompleted = false;
+            const enfermedadRows = enfermedadesTableBody.querySelectorAll('tr');
+            enfermedadRows.forEach(row => {
+                const diagnosticoInput = row.querySelector('input[name="diagnostico"]');
+                const fechaInput = row.querySelector('input[name="fecha_comienzo"]');
+                
+                // Limpiar resaltado
+                diagnosticoInput.classList.remove('required-field');
+                fechaInput.classList.remove('required-field');
+                
+                const diagnosticoValue = diagnosticoInput.value.trim();
+                const fechaValue = fechaInput.value.trim();
+
+                if (diagnosticoValue && fechaValue) {
+                    isEnfermedadCompleted = true;
+                } else if (diagnosticoValue || fechaValue) {
+                    // Si solo uno está lleno, se considera incompleto y se debe resaltar
+                    if (!diagnosticoValue) diagnosticoInput.classList.add('required-field');
+                    if (!fechaValue) fechaInput.classList.add('required-field');
+                    isValid = false; // Detiene la descarga si hay una fila a medio completar
+                }
+            });
+
+            if (!isEnfermedadCompleted) {
+                // Si ninguna fila tiene diagnóstico y fecha, fallar y resaltar la primera fila como ejemplo
+                const firstDiag = enfermedadesTableBody.querySelector('input[name="diagnostico"]');
+                const firstFecha = enfermedadesTableBody.querySelector('input[name="fecha_comienzo"]');
+                firstDiag.classList.add('required-field');
+                firstFecha.classList.add('required-field');
+                isValid = false;
+            }
+            
+            // 3. Validar que al menos una opción de Fundamentos del Diagnóstico esté seleccionada
+            const fundamentosChecklist = document.getElementById('fundamentos-checklist');
+            const checkedFundamentos = fundamentosChecklist.querySelectorAll('input[name="fundamentos"]:checked');
+            
+            // Eliminar estilos de borde antes de validar, para que no se acumulen
+            fundamentosChecklist.style.border = 'none';
+            fundamentosChecklist.style.padding = '0';
+
+            if (checkedFundamentos.length === 0) {
+                fundamentosChecklist.style.border = '2px solid #ef4444';
+                fundamentosChecklist.style.borderRadius = '0.5rem';
+                fundamentosChecklist.style.padding = '0.5rem';
+                isValid = false;
+            }
+            
+            // Mostrar mensaje de error general si la validación falla
+            if (!isValid) {
+                validationMessage.classList.remove('hidden');
+            }
+
+            return isValid;
+        }
+
+        // Evento de descarga
+        downloadBtn.addEventListener('click', (event) => {
+            event.preventDefault(); 
+            
+            if (!validateForm()) {
+                return; // Detener si hay campos obligatorios sin completar
+            }
+            
+            // --- Generación del PDF ---
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let y = 10;
+            const margin = 15;
+            const lineHeight = 7;
+            const titleFontSize = 16;
+            const subtitleFontSize = 12;
+            const sectionTitleFontSize = 14;
+            const labelFontSize = 10;
+            const valueFontSize = 10;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const col1Width = 70;
+            const col2Width = 45;
+            const col3Width = 30;
+            const col4Width = 45;
+
+            function addPageIfNeeded() {
+                if (y > 280) { 
+                    doc.addPage();
+                    y = 10;
+                }
+            }
+
+            // Título
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(titleFontSize);
+            doc.text('INFORME PARA MEDICACIÓN DE USO CRÓNICO - OSPEVIC', pageWidth / 2, y, { align: 'center' });
+            y += lineHeight;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(subtitleFontSize);
+            doc.text('Esta ficha está destinada solo para pacientes bajo tratamiento crónico.', pageWidth / 2, y, { align: 'center' });
+            y += lineHeight;
+            doc.text('No se deberá transcribir medicamentos de uso ocasional, ni aquellos que requiera estricta vigilancia.', pageWidth / 2, y, { align: 'center' });
+            y += lineHeight * 2;
+
+            // Datos Filiatorios
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(sectionTitleFontSize);
+            doc.text('DATOS FILIATORIOS', margin, y);
+            y += lineHeight;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(labelFontSize);
+            
+            const apellidoNombre = document.getElementById('apellido_nombre').value || '';
+            const nAfiliado = document.getElementById('n_afiliado').value || '';
+            const dni = document.getElementById('dni').value || '';
+            const sexo = document.getElementById('sexo').value || '';
+            const fechaNacimiento = document.getElementById('fecha_nacimiento').value || '';
+            const telefono = document.getElementById('telefono').value || '';
+            const domicilio = document.getElementById('domicilio').value || '';
+            const localidad = document.getElementById('localidad').value || '';
+            
+            doc.text('Apellido y Nombre:', margin, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(apellidoNombre, margin + 40, y);
+            doc.setFont('helvetica', 'normal');
+            
+            doc.text('N° Afiliado:', margin + 110, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(nAfiliado, margin + 140, y);
+            doc.setFont('helvetica', 'normal');
+            y += lineHeight;
+
+            doc.text('DNI:', margin, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(dni, margin + 15, y);
+            doc.setFont('helvetica', 'normal');
+
+            doc.text('Sexo:', margin + 50, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(sexo, margin + 65, y);
+            doc.setFont('helvetica', 'normal');
+            
+            doc.text('Fecha de Nacimiento:', margin + 90, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(fechaNacimiento, margin + 140, y);
+            doc.setFont('helvetica', 'normal');
+            y += lineHeight;
+
+            doc.text('Domicilio:', margin, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(domicilio, margin + 25, y);
+            doc.setFont('helvetica', 'normal');
+
+            doc.text('Localidad:', margin + 110, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(localidad, margin + 135, y);
+            doc.setFont('helvetica', 'normal');
+            y += lineHeight;
+
+            doc.text('Tel:', margin, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(telefono, margin + 15, y);
+            doc.setFont('helvetica', 'normal');
+            y += lineHeight * 2;
+            
+            addPageIfNeeded();
+
+            // Resumen de Historia Clínica
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(sectionTitleFontSize);
+            doc.text('RESUMEN DE HISTORIA CLÍNICA', margin, y);
+            y += lineHeight;
+
+            // Tabla de Enfermedades
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(labelFontSize);
+            doc.text('ENFERMEDADES', margin, y + 2);
+            doc.text('DIAGNÓSTICO PRINCIPAL', margin + 60, y + 2);
+            doc.text('FECHA COMIENZO', margin + 120, y + 2);
+            y += lineHeight;
+
+            const enfermedadRows = enfermedadesTableBody.querySelectorAll('tr');
+            enfermedadRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const enfermedad = cells[0].textContent.trim();
+                const diagnostico = cells[1].querySelector('input[name="diagnostico"]').value || '';
+                const fecha = cells[2].querySelector('input[name="fecha_comienzo"]').value || '';
+                
+                if (diagnostico || fecha) { // Solo incluir en el PDF si hay algún dato
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(enfermedad, margin, y + 2);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(diagnostico, margin + 60, y + 2);
+                    doc.text(fecha, margin + 120, y + 2);
+                    doc.setFont('helvetica', 'normal');
+                    y += lineHeight;
+                }
+            });
+            y += lineHeight;
+            
+            addPageIfNeeded();
+
+            // Fundamentos del Diagnóstico
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(subtitleFontSize);
+            doc.text('FUNDAMENTOS DEL DIAGNÓSTICO', margin, y);
+            y += lineHeight;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(labelFontSize);
+            const checkboxes = document.querySelectorAll('input[name="fundamentos"]:checked');
+            checkboxes.forEach(checkbox => {
+                doc.text(`X ${checkbox.value}`, margin + 5, y);
+                y += lineHeight;
+            });
+            y += lineHeight;
+            
+            addPageIfNeeded();
+
+            // Medicación Indicada
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(sectionTitleFontSize);
+            doc.text('MEDICACIÓN INDICADA', margin, y);
+            y += lineHeight;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(labelFontSize);
+            const medHeaders = ['PRINCIPIO ACTIVO Y PRESENTACIÓN', 'UNIDAD POSOLÓGICA', 'COMP/DÍA', 'CANT. ENV. MENSUALES'];
+            let currentX = margin;
+            const medWidths = [70, 45, 30, 45];
+            for (let i = 0; i < medHeaders.length; i++) {
+                doc.rect(currentX, y, medWidths[i], lineHeight);
+                doc.text(medHeaders[i], currentX + 2, y + lineHeight / 2, { baseline: 'middle' });
+                currentX += medWidths[i];
+            }
+            y += lineHeight;
+
+            const medicacionRows = medicacionTableBody.querySelectorAll('tr');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(valueFontSize);
+
+            medicacionRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const principio = cells[0].querySelector('input').value || '';
+                const unidad = cells[1].querySelector('input').value || '';
+                const comp = cells[2].querySelector('input').value || '';
+                const cant = cells[3].querySelector('input').value || '';
+                
+                // Solo imprimir filas de medicación que tengan al menos el principio activo
+                if (principio || unidad || comp || cant) {
+                    addPageIfNeeded();
+                    currentX = margin;
+                    const rowData = [principio, unidad, comp, cant];
+                    for (let i = 0; i < rowData.length; i++) {
+                        doc.rect(currentX, y, medWidths[i], lineHeight);
+                        doc.text(rowData[i], currentX + 2, y + lineHeight / 2, { baseline: 'middle' });
+                        currentX += medWidths[i];
+                    }
+                    y += lineHeight;
+                }
+            });
+            y += lineHeight;
+            
+            addPageIfNeeded();
+
+            // Datos del Médico y Firmas
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(sectionTitleFontSize);
+            doc.text('DATOS DEL MÉDICO Y FIRMAS', margin, y);
+            y += lineHeight;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(labelFontSize);
+            const medicoNombre = document.getElementById('medico_nombre').value || '';
+            const centroAsistencial = document.getElementById('centro_asistencial').value || '';
+            const medicoTel = document.getElementById('medico_telefono').value || '';
+            const fechaFirma = document.getElementById('fecha_firma').value || '';
+
+            // Cambio: Apellido y Nombre
+            doc.text('Apellido y Nombre del Médico tratante:', margin, y);
+            doc.setFont('helvetica', 'bold');
+            // Ajuste de posición: movemos el inicio del Centro Asistencial para darle más espacio al nombre del médico.
+            const medicoNameStartX = margin + 80; // Posición donde comienza el texto del médico
+            const centroAsistencialStartX = margin + 120; // Nueva posición para el inicio del Centro Asistencial
+            
+            doc.text(medicoNombre, medicoNameStartX, y, { align: 'left' });
+            doc.setFont('helvetica', 'normal');
+            
+            doc.text('Centro Asistencial:', centroAsistencialStartX, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(centroAsistencial, centroAsistencialStartX + 40, y);
+            doc.setFont('helvetica', 'normal');
+            y += lineHeight;
+            
+            doc.text('Tel:', margin, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(medicoTel, margin + 15, y);
+            doc.setFont('helvetica', 'normal');
+            
+            doc.text('Fecha:', centroAsistencialStartX, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(fechaFirma, centroAsistencialStartX + 20, y);
+            doc.setFont('helvetica', 'normal');
+            y += lineHeight * 2;
+            
+            doc.text('Firma y aclaración del Paciente', margin, y);
+            doc.text('Firma y sello médico', pageWidth - margin - doc.getStringUnitWidth('Firma y sello médico') * doc.internal.getFontSize() / doc.internal.scaleFactor, y);
+            doc.line(margin, y + 10, margin + 70, y + 10);
+            doc.line(pageWidth - margin - 70, y + 10, pageWidth - margin, y + 10);
+
+            doc.save('informe_medicacion_cronica.pdf');
+        });
+    </script>
+</body>
+</html>
